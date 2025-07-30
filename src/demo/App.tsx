@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { InfiniteGrid } from "../InfiniteGrid";
 import { InfiniteGridV2 } from "../InfiniteGridV2";
+import { useInfiniteGrid } from "../useInfiniteGrid";
 
 const items = Array.from({ length: 100_000 }).map((_, index) => ({
   id: index,
@@ -24,8 +26,31 @@ const items = Array.from({ length: 100_000 }).map((_, index) => ({
 // };
 
 export default function App() {
+  const { data, onScroll } = useInfiniteGrid({
+    items,
+    limit: 12,
+    columns: 4,
+    gap: 16,
+  });
+
+  useEffect(() => {
+    const [html] = document.getElementsByTagName("html");
+    console.log("html", html);
+    if (!html) {
+      console.warn("No html element found");
+      return;
+    }
+    const a = () => {
+      console.log("9999999", 9999999);
+    };
+    html.addEventListener("scroll", a);
+    return () => {
+      html.removeEventListener("scroll", a);
+    };
+  }, [onScroll]);
+
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={{ height: "100%", overflowY: "auto" }}>
       <h1>Demo: InfiniteGrid</h1>
       {/* <InfiniteGrid
         style={{
@@ -52,7 +77,7 @@ export default function App() {
         )}
       /> */}
       <InfiniteGrid
-        items={items}
+        data={data}
         itemRenderer={(item) => (
           <div
             style={{
